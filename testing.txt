@@ -1,0 +1,14 @@
+1) schrnutí - zvládne
+2) matika - zvládá nižší pocty
+3) prace s internem - ne
+4) přístup k internetu - nejspise ano, tvrdí že našel přímo stránky prostějov
+5) vyhledávání dat na zadaném odkazu -ne
+6) přístup k naučeným znalostem - přístupno duben 2023
+7) překlad - zvládne
+8) informace mimo soubory jsou dost omezené - otazky ohledně archytektury a historie
+9) budoucí akce z webu - nezískal 
+10)naplánovýní výletu do prostějova -navrh 6 míst bez přesnějších informací
+
+
+potencionální bug
+1) "schrn mi data ze svych zdroju" vypíše počet souboru a častečně cituje
