@@ -1,6 +1,6 @@
 <?php
 include("config.php");
-$test =  new openAiObject();
+//$test =  new openAiObject();
 
 class openAiObject{
     private $OPENAI_API_KEY =$open_Api_Key;
@@ -218,9 +218,9 @@ class Message
 
 
 //uplaud a mazání souboru ŕozdeláno
-//$test = new FilesManagment();
+$test = new FilesManagment();
 //$test->DeleteFile("asst_qbRrJdnZw3W2z5uvKq9qww1W","file-Atm4doWzBG9IXk9QSEiA5TeN");
-//$test->FileUplaud();
+$test->FileUplaud();
 class FilesManagment{
     private $OPENAI_API_KEY = $open_Api_Key;
     function FileUplaud(){
