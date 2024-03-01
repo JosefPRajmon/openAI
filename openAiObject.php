@@ -228,12 +228,12 @@ class FilesManagment{
     public function __construct($id){
         $this->OPENAI_API_KEY = $id;
     }
-    
+
     function FileUplaud(){
         $ch = curl_init();
         $file = new CURLFile('prostejov-novinky.jsonl', 'application/octet-stream');
         $data = array(
-            'purpose' => 'search',
+            'purpose' => 'assistants',
             'file' => $file
         );
         var_dump($data);
