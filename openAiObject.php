@@ -1,9 +1,9 @@
 <?php
 include("config.php");
-//$test =  new openAiObject();
+//$test =  new openAiObject($open_Api_Key);
 
 class openAiObject{
-    private $OPENAI_API_KEY =$open_Api_Key;
+    private $OPENAI_API_KEY;
     private $THREAD_ID;
     private $RUN_ID;
    /*
@@ -42,7 +42,9 @@ class openAiObject{
         return array($this->THREAD_ID,$this->RUN_ID);
     }
    }
-
+   public function __construct($id){
+    $this->OPENAI_API_KEY = $id;
+   }
     private function CreateThread(){
         $curl = curl_init();
         /*
@@ -218,11 +220,15 @@ class Message
 
 
 //uplaud a mazání souboru ŕozdeláno
-$test = new FilesManagment();
+$test = new FilesManagment($open_Api_Key);
 //$test->DeleteFile("asst_qbRrJdnZw3W2z5uvKq9qww1W","file-Atm4doWzBG9IXk9QSEiA5TeN");
 $test->FileUplaud();
 class FilesManagment{
-    private $OPENAI_API_KEY = $open_Api_Key;
+    private $OPENAI_API_KEY;
+    public function __construct($id){
+        $this->OPENAI_API_KEY = $id;
+    }
+    
     function FileUplaud(){
         $ch = curl_init();
         $file = new CURLFile('prostejov-novinky.jsonl', 'application/octet-stream');
