@@ -221,38 +221,134 @@ class Message
 
 //uplaud a mazání souboru ŕozdeláno
 $test = new FilesManagment($open_Api_Key);
-//$test->DeleteFile("asst_qbRrJdnZw3W2z5uvKq9qww1W","file-Atm4doWzBG9IXk9QSEiA5TeN");
-$test->FileUplaud();
+//ve funkci FileUplaud je třeba upravit cestu k souboru $file = new CURLFile(__DIR__ . '/' . $fileName, 'application/octet-stream',$fileName);
+//funkce se postará o smazaní puvodních souboru a nahraní +napojení nových
+$test->DataFunctionCaller("asst_qwNsFaZ9AQVNHOKNqC8wRDoz","prostejov-novinky.jsonl");
+
 class FilesManagment{
     private $OPENAI_API_KEY;
     public function __construct($id){
         $this->OPENAI_API_KEY = $id;
     }
 
-    function FileUplaud(){
-        $ch = curl_init();
-        $file = new CURLFile('prostejov-novinky.jsonl', 'application/octet-stream');
-        $data = array(
-            'purpose' => 'assistants',
-            'file' => $file
+    function DataFunctionCaller($assistID,$fileName){
+        //najití a smazání souboru se stejným jménem pokud není tak to chytně try catch
+        $arrayAllFiles =json_decode($this->GetFiles())->data;
+            foreach ($arrayAllFiles as $key => $value) {
+                if ($value->filename == $fileName) {
+                    try {
+                        $this->RemoveFilesFromAssist($assistID,$value->id);
+                    } catch (Throwable $th) {
+                        //throw $th;
+                    }
+                    try {
+                        $this->DeleteFile($assistID,$value->id);
+                    } catch (\Throwable $th) {
+                        //throw $th;
+                    }
+                }
+            }
+
+        $this->FileUplaud($assistID,$fileName);
+
+    }
+
+    function GetFiles(){
+        $url = "https://api.openai.com/v1/files";
+
+        $headers = array(
+            "Authorization: Bearer " . $this->OPENAI_API_KEY
         );
-        var_dump($data);
-        curl_setopt($ch, CURLOPT_URL, 'https://api.openai.com/v1/files/upload');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-        curl_setopt($ch, CURLOPT_VERBOSE, 1);
-        $headers = array();
-        $headers[] = "Content-Type: multipart/form-data";
-        $headers[] = 'Authorization: Bearer ' . $this->OPENAI_API_KEY;
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         $result = curl_exec($ch);
+
         if (curl_errno($ch)) {
+            echo 'Error:' . curl_error($ch);
+        }
+
+        curl_close($ch);
+
+        return $result;
+
+    }
+
+    function GetAssistFiles(){
+        $headers = array(
+            "Content-Type: application/json",
+            "Authorization: Bearer " . $this->OPENAI_API_KEY,
+            "OpenAI-Beta: assistants=v1"
+        );
+
+        $ch = curl_init( "https://api.openai.com/v1/assistants?order=desc&limit=20");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+        $result = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            echo 'Error:' . curl_error($ch);
+        }
+
+        curl_close($ch);
+
+        var_dump($result);
+    }
+
+    function FileUplaud($assistID,$fileName){
+        $ch = curl_init();
+        $file = new CURLFile(__DIR__ . '/' . $fileName, 'application/octet-stream',$fileName);
+        curl_setopt($ch, CURLOPT_URL, 'https://api.openai.com/v1/files');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, array(
+            'purpose' => 'assistants',
+            'file' => $file
+        ));
+        curl_setopt($ch, CURLOPT_VERBOSE, 1);
+        $headers = array();
+        $headers[] = 'User-Agent: Apidog/1.0.0 (https://apidog.com)';
+        $headers[] = 'Authorization: Bearer ' . $this->OPENAI_API_KEY;
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        $result = curl_exec($ch);
+        if (curl_errno($ch)) {
+            var_dump(curl_errno($ch));
             var_dump( 'Error:' . curl_error($ch));
         }
-        curl_close($ch);       
-        var_dump($result);
+        $this->CreateAssistFile($assistID,json_decode($result)->id);
+    }
+
+    function CreateAssistFile($assistID,$fileID){
+        $url = "https://api.openai.com/v1/assistants/$assistID/files";
+        
+        $headers = array(
+            "Authorization: Bearer " . $this->OPENAI_API_KEY,
+            "Content-Type: application/json",
+            "OpenAI-Beta: assistants=v1"
+        );
+        
+        $data = array(
+            "file_id" => $fileID
+        );
+        
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        
+        $result = curl_exec($ch);
+        
+        if (curl_errno($ch)) {
+            echo 'Error:' . curl_error($ch);
+        }
+        
+        curl_close($ch);
+        
+        //var_dump($result);
     }
 
     function DeleteFile($assistID,$fileID){

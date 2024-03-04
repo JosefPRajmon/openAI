@@ -3,7 +3,6 @@ include_once("openAiObject.php");
 
 ?>
 <?php
-/*
 session_start();
 //pod jmenem chatbota 
 $chatBotID ="asst_qwNsFaZ9AQVNHOKNqC8wRDoz";
@@ -24,7 +23,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
 }
-*/
 ?>
 
 <!DOCTYPE html>
@@ -41,13 +39,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($_POST['message'])) {
             if (strlen($_POST['message'])>1) {
                 $sendMessage = $_POST["message"];
-                //$test->AddInstruction($sendMessage,isset($_POST["table"]));
+                $test->AddInstruction($sendMessage,isset($_POST["table"]));
 
-                //$test->NewMessage($sendMessage);
-                //$a= $test->CheckReply();
-                //var_dump($a[0]->content[0]->text);
-                    //var_dump($a);
-                    $a=array(
+                $test->NewMessage($sendMessage);
+                $a= $test->CheckReply();
+                    /*$a=array(
                         new Message("zprava jedna","user"),
                         new Message("zprava dva","assistent"),
                         new Message("zprava tři","user"),
@@ -58,14 +54,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         new Message("zprava osm","assistent"),
                         new Message("zprava devet","user"),
                         new Message("zprava deset","assistent")
-                    );
+                    );*/
                 foreach (array_reverse($a) as $key => $value) {
                     $role = $value->role;
-                    //$message =$value->content[0]->text->value;
-                    //$message = $test->ReplaceInResponse($message,$role);
+                    $message =$value->content[0]->text->value;
+                    $message = $test->ReplaceInResponse($message,$role);
                     // $message=preg_replace('/\[(https:\/\/.*?)]\((https:\/\/.*?)\)/i', '<a href="\1">\2</a>', $message);
 
-                    $message =$value->message;
+                    //$message =$value->message;
                     echo("<p class=\"$role\"><strong> $role<br></strong> $message</p>");
                 }
                 
@@ -86,6 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   
     <script src="chat.js"></script>
     <script>
+        //automatická aktualizace (zatím není třeba)
       /*  var userId = 'x'; // Nahraďte 'x' ID uživatele, kterého chcete sledovat
 
 setInterval(function() {
